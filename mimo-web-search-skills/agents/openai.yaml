@@ -1,0 +1,7 @@
+interface:
+  display_name: "MiMo Web Search"
+  short_description: "Search live web with MiMo citations"
+  default_prompt: "Use $mimo-web-search to answer a current web question with citations."
+
+policy:
+  allow_implicit_invocation: true
