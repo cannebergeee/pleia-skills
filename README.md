@@ -12,7 +12,8 @@
 | 🎨 **runninghub-image-gen** | 通过 RunningHub API 调用 AI 图像生成/编辑工作流，支持文生图、图生图、改图等 | Node.js |
 | ✍️ **cn-polish** | 中文润色、英译中、UI 字符串本地化，支持 OpenAI / Gemini / Anthropic 多种 LLM | Python |
 | 🖼️ **step-image** | 调用阶跃星辰 StepFun API 文生图与图像编辑，基于 step-image-edit-2 模型 | Node.js |
-| 👁️ **vision-assist** | MCP 视觉助手，分析图像并回答视觉问题，支持 MCP 协议与纯脚本两种模式 | Python + Node |
+| 🧩 **vision-assist-mcp** | MCP 视觉助手，通过 MCP 协议调用 vision 模型分析图像，自动注册为 MCP 工具 | Python + Node |
+| 👁️ **vision-assist-pure** | 纯脚本版视觉助手，通过 CLI 调用 vision 模型分析图像，无需 MCP 环境 | Python |
 
 ---
 
@@ -32,7 +33,8 @@
 - runninghub-image-gen → 需要复制 .env.example 为 .env，填入 RUNNINGHUB_API_KEY
 - cn-polish → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key
 - step-image → 需要在 step-image 目录下创建 .env 文件，填入 STEP_IMAGE_API_KEY
-- vision-assist → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key；MCP 版本需要按客户端注册 MCP 服务
+- vision-assist-mcp → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key；已附带各客户端的 MCP 注册配置
+- vision-assist-pure → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key
 
 安装步骤：
 1. git clone 仓库到本地临时目录
@@ -54,14 +56,16 @@ cp -r mimo-web-search-skills ~/.claude/skills/
 cp -r runninghub-image-gen ~/.claude/skills/
 cp -r cn-polish ~/.claude/skills/
 cp -r step-image ~/.claude/skills/
-cp -r vision-assist ~/.claude/skills/
+cp -r vision-assist-mcp ~/.claude/skills/
+cp -r vision-assist-pure ~/.claude/skills/
 
 # Codex
 cp -r mimo-web-search-skills ~/.codex/skills/
 cp -r runninghub-image-gen ~/.codex/skills/
 cp -r cn-polish ~/.codex/skills/
 cp -r step-image ~/.codex/skills/
-cp -r vision-assist ~/.codex/skills/
+cp -r vision-assist-mcp ~/.codex/skills/
+cp -r vision-assist-pure ~/.codex/skills/
 
 # 配置 API Key
 cp runninghub-image-gen/.env.example runninghub-image-gen/.env  # 编辑填入 RUNNINGHUB_API_KEY
@@ -175,43 +179,76 @@ node step-image/run.js edit -i input.png -p "把猫换成狗"
 
 ---
 
-## 👁️ vision-assist
+## 🧩 vision-assist-mcp
 
-> 分析图像并回答视觉问题。提供 MCP 协议版和纯脚本版两种使用方式。
+> MCP 协议版视觉助手。通过 MCP 协议将 vision 模型能力暴露为 Agent 可直接调用的工具。支持多种 vision provider。
 
-**两种版本：**
+**可用工具：**
 
-| 版本 | 使用方式 | 适用场景 |
-|------|----------|----------|
-| **MCP 版** | 注册 MCP 服务，Agent 自动调用 | 支持 MCP 的客户端（Claude Code、Codex、OpenCode 等） |
-| **纯脚本版** (`pure-skill/`) | 直接执行 Python 脚本 | MCP 不可用的环境 |
+| 工具 | 说明 |
+|------|------|
+| `vision_assist` | 查询当前 vision model 处理一个或多个图像 |
+| `vision_preflight` | 检查 provider 是否可连通和鉴权 |
+| `vision_config_list` | 显示当前配置（API Key 已脱敏） |
+| `vision_config_check_key` | 检查某个 provider 的 API Key 是否已设置 |
+| `vision_config_use` | 切换当前使用的 provider |
+| `vision_config_set` | 设置配置项 |
+| `vision_config_get` | 读取配置项 |
 
-**快速开始（纯脚本版）：**
+**已附带的 MCP 注册配置：**
+
+| 客户端 | 配置文件 |
+|--------|----------|
+| Codex | `vision-assist-mcp/.mcp.json` |
+| Claude Code | `vision-assist-mcp/.claude/mcp.json` |
+| OpenCode / VS Code | `vision-assist-mcp/.vscode/mcp.json` |
+
+所有配置指向 `mcp/run.mjs` 作为入口，自动寻找 Python 解释器。
+
+**快速开始：**
 
 ```bash
-cp vision-assist/pure-skill/scripts/config.example.json vision-assist/pure-skill/scripts/config.json
+cp vision-assist-mcp/scripts/config.example.json vision-assist-mcp/scripts/config.json
+# 编辑 config.json 填入 API Key，或运行:
+cd vision-assist-mcp
+python scripts/vision_assist.py config --set openai.api_key YOUR_KEY
+python scripts/vision_assist.py config --use openai
+python scripts/vision_assist.py config --check-key
+```
+
+**依赖：** Python 3.8+、Node.js 18+、`requests` 包、Vision provider API Key
+
+参考 [SKILL.md](vision-assist-mcp/SKILL.md) 查看完整用法和 MCP 配置说明。
+
+---
+
+## 👁️ vision-assist-pure
+
+> 纯脚本版视觉助手。无需 MCP 环境，直接通过 CLI 调用 vision 模型分析图像。适合不支持 MCP 的 Agent 平台。
+
+**支持的模式：**
+
+| 模式 | 说明 |
+|------|------|
+| `ask` | 分析图像并回答视觉问题 |
+| `preflight` | 检查 provider 连通性 |
+| `config` | 配置管理（设置 API Key、切换 provider） |
+
+**快速开始：**
+
+```bash
+cp vision-assist-pure/scripts/config.example.json vision-assist-pure/scripts/config.json
 # 编辑 config.json 填入 API Key
 
-cd vision-assist/pure-skill
-python scripts/vision_assist.py analyze -i /path/to/image.jpg -p "描述这张图片"
+cd vision-assist-pure
+python scripts/vision_assist.py ask -p "描述这张图片的详细内容" -i /path/to/image.jpg
+python scripts/vision_assist.py ask -p "Transcribe all visible text" -i sign.png
+python scripts/vision_assist.py preflight
 ```
 
-**MCP 版注册（以 OpenCode / VS Code 为例）：**
+**依赖：** Python 3.8+、`requests` 包、配置文件（填入视觉模型 API Key）
 
-```json
-{
-  "mcpServers": {
-    "vision-assist": {
-      "command": "node",
-      "args": ["path/to/vision-assist/mcp/run.mjs"]
-    }
-  }
-}
-```
-
-**依赖：** Python 3.8+、Node.js 18+、配置文件（填入视觉模型 API Key）
-
-参考 [SKILL.md](vision-assist/SKILL.md) 查看完整用法和 MCP 配置说明。
+参考 [SKILL.md](vision-assist-pure/SKILL.md) 查看完整用法和参数说明。
 
 ---
 

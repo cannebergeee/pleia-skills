@@ -1,0 +1,8 @@
+ {
+   "mcpServers": {
+     "vision-assist": {
+       "command": "node",
+       "args": ["mcp/run.mjs"]
+     }
+   }
+ }

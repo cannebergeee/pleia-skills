@@ -1,0 +1,29 @@
+ {
+   "active_provider": "openai",
+   "providers": {
+     "openai": {
+       "type": "openai",
+       "api_key": "",
+       "base_url": "https://api.openai.com/v1",
+       "model": "gpt-4o-mini",
+       "max_tokens": 2048,
+       "temperature": 0.4
+     },
+     "gemini": {
+       "type": "gemini",
+       "api_key": "",
+       "base_url": "https://generativelanguage.googleapis.com/v1beta",
+       "model": "gemini-2.5-pro",
+       "max_tokens": 2048,
+       "temperature": 0.4
+     },
+     "anthropic": {
+       "type": "anthropic",
+       "api_key": "",
+       "base_url": "https://api.anthropic.com/v1",
+       "model": "claude-opus-4-7",
+       "max_tokens": 2048,
+       "temperature": 0.4
+     }
+   }
+ }
