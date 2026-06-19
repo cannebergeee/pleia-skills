@@ -24,53 +24,20 @@
 > 把下面这段 **直接粘贴给你的 AI Agent**，它会自己完成安装和配置。
 
 ````text
-请帮我安装以下 Agent Skills，将它们克隆并复制到当前平台的 skills 目录：
-
-仓库地址：https://github.com/cannebergeee/pleia-skills
-
-需要安装的 skills：
-- mimo-web-search-skills → 需要配置 MIMO_API_KEY 环境变量
-- runninghub-image-gen → 需要复制 .env.example 为 .env，填入 RUNNINGHUB_API_KEY
-- cn-polish → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key
-- step-image → 需要在 step-image 目录下创建 .env 文件，填入 STEP_IMAGE_API_KEY
-- vision-assist-mcp → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key；已附带各客户端的 MCP 注册配置
-- vision-assist-pure → 需要复制 scripts/config.example.json 为 scripts/config.json，填入 API Key
-
-安装步骤：
-1. git clone 仓库到本地临时目录
-2. 检测当前平台（Claude Code / Codex / OpenCode 等），找到对应的 skills 路径
-3. 将各 skill 目录复制过去
-4. 检查各 skill 的配置文件 / 环境变量，缺失则提醒我配置
-5. 完成后告诉我安装结果
+请帮我安装 Agent Skills。克隆 https://github.com/cannebergeee/pleia-skills，把需要的 skill 目录复制到当前平台的 skills 路径下，检查各 skill 的配置文件和 API Key（详见各目录下的 SKILL.md），完成后告诉我结果。
 ````
 
 ### 👤 给人类看
 
 ```bash
 git clone https://github.com/cannebergeee/pleia-skills.git
-cd pleia-skills
 
-# 安装到各平台
-# Claude Code
-cp -r mimo-web-search-skills ~/.claude/skills/
-cp -r runninghub-image-gen ~/.claude/skills/
-cp -r cn-polish ~/.claude/skills/
-cp -r step-image ~/.claude/skills/
-cp -r vision-assist-mcp ~/.claude/skills/
-cp -r vision-assist-pure ~/.claude/skills/
+# 复制需要的 skill 到对应平台
+cp -r <skill-dir> ~/.claude/skills/               # Claude Code
+cp -r <skill-dir> ~/.codex/skills/                # Codex
+cp -r <skill-dir> ~/.config/opencode/skills/      # OpenCode
 
-# Codex
-cp -r mimo-web-search-skills ~/.codex/skills/
-cp -r runninghub-image-gen ~/.codex/skills/
-cp -r cn-polish ~/.codex/skills/
-cp -r step-image ~/.codex/skills/
-cp -r vision-assist-mcp ~/.codex/skills/
-cp -r vision-assist-pure ~/.codex/skills/
-
-# 配置 API Key
-cp runninghub-image-gen/.env.example runninghub-image-gen/.env  # 编辑填入 RUNNINGHUB_API_KEY
-cp cn-polish/scripts/config.example.json cn-polish/scripts/config.json  # 编辑填入 LLM API Key
-export MIMO_API_KEY="your-mimo-api-key"
+# 配置方法见各 skill 目录下的 SKILL.md
 ```
 
 ---
