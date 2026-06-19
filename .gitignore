@@ -1,2 +1,4 @@
 # Environment files with secrets
 **/.env
+**/config.json
+**/__pycache__/
