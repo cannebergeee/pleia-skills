@@ -1,6 +1,6 @@
 # pleia-skills
 
-个人日常使用的 Agent Skills，让 AI Agent 能更好地完成特定任务。每个 skill 都是自包含的指令集 + 脚本，放到对应平台的 skills 目录下即可生效。
+个人日常做的一些小工具 Skills，让 AI Agent 能更好地完成特定任务。每个 skill 都是自包含的指令集 + 脚本，放到对应平台的 skills 目录下即可生效。
 
 ---
 
